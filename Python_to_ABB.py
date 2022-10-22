@@ -1,6 +1,8 @@
 #fetch data from arduino components
 import numpy as np
+x=1
 While x=1:
+  #get the rotational and displacement data from the gyro
   X=
   Y=
   Z=
@@ -8,17 +10,6 @@ While x=1:
   XZR=
   YZR=
   Dis= np.array([X,Y,Z,XYR,XZR,YZR])
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -32,7 +23,7 @@ msg = ''
 client.connect((host,port)) #Socket oppkobling
 print('Send command til roboten, skriv exit for å avslutte programmet')
 while(msg != 'exit'):
- msg = input() #Les inn beskjed fra brukeren
+ msg = Dis
  client.send(bytes(msg,'utf-8')) #Sender data til robotstudio
 
 client.close()
