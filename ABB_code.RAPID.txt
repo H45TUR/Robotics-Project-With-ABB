@@ -1,0 +1,60 @@
+MODULE MainModule
+ VAR socketdev server;
+ VAR socketdev client;
+ VAR string Client_IP;
+ VAR string data:= "";
+ VAR string imput_axis;
+ VAR string imput_value;
+ VAR bool Constant;
+ VAR num x;
+ VAR num y;
+ VAR num z;
+ VAR num xyr;
+ VAR num xzr;
+ VAR num zyr;
+ VAR string open;
+ VAR string close;
+ VAR num imput_value_max;
+
+
+ PROC Main()
+ SocketCreate server;
+ SocketBind server, "127.0.0.1", 2222;
+ SocketListen server;
+SocketAccept server, client, \ClientAddress:=Client_IP, \Time:=120;
+ TPWrite Client_IP;
+
+ WHILE data<> "stop" DO
+ SocketReceive client \Str:=data;
+ TPWrite data;
+ imput_value_max := StrLen(data);
+ imput_axis := StrPart(data,1,1);
+ imput_value := StrPart(data,2,imput_value_max-1);
+
+ !move from an offset position
+ IF imput_axis = "x" THEN
+  Constant := StrToVal(imput_value,x);
+  MoveL Offs(CRobT(),x,0,0),v100,fine,Festo_Grip_1\WObj:=wobj0;
+  !SocketSend client\Str:= data + "action finished";
+ ELSEIF imput_axis = "y" THEN
+  Constant := StrToVal(imput_value,y);
+  MoveL Offs(CRobT(),0,y,0),v100,fine,Festo_Grip_1\WObj:=wobj0;
+ ELSEIF imput_axis = "z" THEN
+  Constant := StrToVal(imput_value,z);
+  MoveL Offs(CRobT(),0,0,z),v100,fine,Festo_Grip_1\WObj:=wobj0;
+
+ ELSEIF data = "open" THEN
+  SetDO DO10_2, 0;
+  SetDO DO10_3, 1;
+ ELSEIF data = "close" THEN
+  SetDO DO10_2, 1;
+  SetDO DO10_3, 0;
+ ENDIF
+
+
+ ENDWHILE
+
+ SocketClose server;
+ SocketClose client;
+ ENDPROC
+ENDMODULE
